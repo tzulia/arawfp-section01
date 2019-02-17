@@ -26,8 +26,9 @@ class Item(Resource):
         help=PARSER_BLANK_ERROR.format("store_name"),
     )
 
+    @classmethod
     @jwt_required
-    def get(self, name: str):
+    def get(cls, name: str):
         item = ItemModel.find_by_name(name)
 
         if item:
@@ -35,8 +36,9 @@ class Item(Resource):
 
         return {"error": ITEM_NOT_FOUND_ERROR}, 404
 
+    @classmethod
     @jwt_required
-    def post(self, name: str):
+    def post(cls, name: str):
         if ItemModel.find_by_name(name):
             return {"error": ITEM_ALREADY_EXISTS_ERROR}, 400
 
@@ -58,8 +60,9 @@ class Item(Resource):
 
         return new_item.json(), 201
 
+    @classmethod
     @jwt_required
-    def put(self, name: str):
+    def put(cls, name: str):
         data = Item.parser.parse_args()
 
         item = ItemModel.find_by_name(name)
@@ -95,8 +98,9 @@ class Item(Resource):
 
             return new_item.json(), 201
 
+    @classmethod
     @jwt_required
-    def delete(self, name: str):
+    def delete(cls, name: str):
         item = ItemModel.find_by_name(name)
         if not item:
             return {"error": ITEM_NOT_FOUND_ERROR}, 400
@@ -107,6 +111,7 @@ class Item(Resource):
 
 
 class ItemList(Resource):
+    @classmethod
     @jwt_required
-    def get(self):
+    def get(cls):
         return {"items": [item.json() for item in ItemModel.find_all()]}

@@ -14,8 +14,9 @@ class TokenList(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument("hide_revoked", type=bool, required=False, default=True)
 
+    @classmethod
     @jwt_required
-    def get(self):
+    def get(cls):
         user_id = get_jwt_identity()
         tokens = BlacklistToken.get_all_tokens_by_user_id(user_id)
 
@@ -24,9 +25,10 @@ class TokenList(Resource):
 
         return {"tokens": []}
 
+    @classmethod
     @jwt_required
-    def post(self):
-        data = self.parser.parse_args()
+    def post(cls):
+        data = cls.parser.parse_args()
         user_id = get_jwt_identity()
         tokens = BlacklistToken.get_all_tokens_by_user_id(user_id)
 

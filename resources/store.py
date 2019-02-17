@@ -12,16 +12,18 @@ STORE_DB_ERROR = "The server did not answer in time, please try again later."
 
 
 class Store(Resource):
+    @classmethod
     @jwt_required
-    def get(self, name: str):
+    def get(cls, name: str):
         store = StoreModel.find_by_name(name)
         if store:
             return store.json(-1)
 
         return {"message": STORE_NOT_FOUND_ERROR}, 404
 
+    @classmethod
     @jwt_required
-    def post(self, name: str):
+    def post(cls, name: str):
         if StoreModel.find_by_name(name):
             return {"error": STORE_ALREADY_EXISTS_ERROR}, 400
 
@@ -33,8 +35,9 @@ class Store(Resource):
 
         return new_store.json(), 201
 
+    @classmethod
     @jwt_required
-    def delete(self, name: str):
+    def delete(cls, name: str):
         store = StoreModel.find_by_name(name)
 
         if store:
@@ -44,6 +47,7 @@ class Store(Resource):
 
 
 class StoreList(Resource):
+    @classmethod
     @jwt_required
-    def get(self):
+    def get(cls):
         return {"stores": [store.json() for store in StoreModel.find_all()]}

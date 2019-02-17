@@ -63,7 +63,8 @@ class UserList(Resource):
 
 
 class UserRegister(Resource):
-    def post(self):
+    @classmethod
+    def post(cls):
         data = _user_parser.parse_args()
 
         if UserModel.find_by_username(data["username"]):
