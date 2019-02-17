@@ -51,11 +51,11 @@ class BlacklistToken(db.Model):
         }
 
     @classmethod
-    def get_all_tokens_by_user_id(cls, user_id: int) -> List:
+    def get_all_tokens_by_user_id(cls, user_id: int) -> List["BlacklistToken"]:
         return cls.query.filter_by(user_identity=user_id).all()
 
     @classmethod
-    def is_token_revoked(cls, decoded_token: str):
+    def is_token_revoked(cls, decoded_token: str) -> bool:
         db_token = cls.query.filter_by(jti=decoded_token['jti']).first()
 
         if not db_token:
@@ -64,7 +64,7 @@ class BlacklistToken(db.Model):
         return db_token.revoked
 
     @classmethod
-    def get_all(cls, filter: int = 10) -> List:
+    def get_all(cls, filter: int = 10) -> List[TokenJSON]:
         return [
             t.json() for t in cls.query.limit(filter).all()
         ]
