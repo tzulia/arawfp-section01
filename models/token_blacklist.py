@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 from datetime import datetime
 
 from flask_jwt_extended import decode_token
@@ -5,11 +7,11 @@ from flask_jwt_extended import decode_token
 from db import db
 
 
-def _epoch_utc_to_datetime(epoch_utc):
+def _epoch_utc_to_datetime(epoch_utc: str):
     return datetime.fromtimestamp(epoch_utc)
 
 
-def _format_datetime(dt):
+def _format_datetime(dt: datetime):
     return '{:02d}/{:02d}/{} {:02d}:{:02d}:{:02d}'.format(
         dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second
     )
@@ -27,7 +29,7 @@ class BlacklistToken(db.Model):
 
     user = db.relationship('UserModel')
 
-    def __init__(self, encoded_token):
+    def __init__(self, encoded_token: str):
         decoded_token = decode_token(encoded_token)
         self.jti = decoded_token['jti']
         self.token_type = decoded_token['type']
@@ -35,7 +37,7 @@ class BlacklistToken(db.Model):
         self.revoked = False
         self.expires = _epoch_utc_to_datetime(decoded_token['exp'])
 
-    def json(self):
+    def json(self) -> Dict:
         return {
             'id': self.id,
             'jti': self.jti,
@@ -47,11 +49,11 @@ class BlacklistToken(db.Model):
         }
 
     @classmethod
-    def get_all_tokens_by_user_id(cls, user_id):
+    def get_all_tokens_by_user_id(cls, user_id: int) -> List:
         return cls.query.filter_by(user_identity=user_id).all()
 
     @classmethod
-    def is_token_revoked(cls, decoded_token):
+    def is_token_revoked(cls, decoded_token: str):
         db_token = cls.query.filter_by(jti=decoded_token['jti']).first()
 
         if not db_token:
@@ -60,25 +62,25 @@ class BlacklistToken(db.Model):
         return db_token.revoked
 
     @classmethod
-    def get_all(cls, filter=10):
+    def get_all(cls, filter: int = 10) -> List:
         return [
             t.json() for t in cls.query.limit(filter).all()
         ]
 
-    def revoke(self):
+    def revoke(self) -> bool:
         self.revoked = True
         self.save_to_db()
         return True
 
-    def unrevoke(self):
+    def unrevoke(self) -> bool:
         self.revoked = False
         self.save_to_db()
         return True
 
-    def save_to_db(self):
+    def save_to_db(self) -> None:
         db.session.add(self)
         db.session.commit()
 
-    def delete_from_db(self):
+    def delete_from_db(self) -> None:
         db.session.delete(self)
         db.session.commit()

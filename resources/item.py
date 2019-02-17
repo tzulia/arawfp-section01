@@ -11,7 +11,7 @@ class Item(Resource):
     parser.add_argument('store_name', type=str, required=True, help="Every item needs a store_name")
 
     @jwt_required
-    def get(self, name):
+    def get(self, name: str):
         item = ItemModel.find_by_name(name)
 
         if item:
@@ -20,7 +20,7 @@ class Item(Resource):
         return {'error': 'Item not found'}, 404
 
     @jwt_required
-    def post(self, name):
+    def post(self, name: str):
         if ItemModel.find_by_name(name):
             return {'error': 'Item already exists!'}, 400
 
@@ -40,7 +40,7 @@ class Item(Resource):
         return new_item.json(), 201
 
     @jwt_required
-    def put(self, name):
+    def put(self, name: str):
         data = Item.parser.parse_args()
 
         item = ItemModel.find_by_name(name)
@@ -74,7 +74,7 @@ class Item(Resource):
             return new_item.json(), 201
 
     @jwt_required
-    def delete(self, name):
+    def delete(self, name: str):
         item = ItemModel.find_by_name(name)
         if not item:
             return {'error': 'Item does not exist'}, 400

@@ -1,3 +1,4 @@
+from typing import Dict, List, Tuple
 from functools import wraps
 
 from db import db
@@ -14,12 +15,12 @@ class UserModel(db.Model):
 
     tokens = db.relationship('BlacklistToken', lazy='dynamic')
 
-    def __init__(self, username, password, is_admin):
+    def __init__(self, username: str, password: str, is_admin: bool):
         self.username = username
         self.password = password
         self.is_admin = is_admin
 
-    def json(self):
+    def json(self) -> Dict:
         return {
             'id': self.id,
             'username': self.username,
@@ -28,25 +29,26 @@ class UserModel(db.Model):
         }
 
     @classmethod
-    def find_by_username(cls, username):
+    def find_by_username(cls, username: str):
         return cls.query.filter_by(username=username).first()
 
     @classmethod
-    def find_by_id(cls, _id):
+    def find_by_id(cls, _id: int):
         return cls.query.filter_by(id=_id).first()
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls) -> List:
         return cls.query.all()
 
-    def save_to_db(self):
+    def save_to_db(self) -> Tuple[Dict, int]:
         if self.username and self.password:
             db.session.add(self)
             db.session.commit()
+            return {'message': 'Saved'}, 200
         else:
             return {'error': 'Please input username/password'}, 400
 
-    def delete_from_db(self):
+    def delete_from_db(self) -> None:
         db.session.delete(self)
         db.session.commit()
 

@@ -28,7 +28,7 @@ class User(Resource):
     @classmethod
     @jwt_required
     @UserModel.require_admin
-    def get(cls, user_id):
+    def get(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
 
         if not user:
@@ -40,7 +40,7 @@ class User(Resource):
     @classmethod
     @jwt_required
     @UserModel.require_admin
-    def delete(cls, user_id):
+    def delete(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
 
         if not user:
@@ -60,7 +60,7 @@ class UserList(Resource):
     @UserModel.require_admin
     def get(cls):
         return {
-            'users': list(map(lambda user: user.json(), UserModel.get_all()))
+            'users': [user.json() for user in UserModel.get_all()]
         }
 
 
