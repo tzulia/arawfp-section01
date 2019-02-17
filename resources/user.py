@@ -39,6 +39,7 @@ class User(Resource):
 
     @classmethod
     @jwt_required
+    @UserModel.require_admin
     def delete(cls, user_id):
         user = UserModel.find_by_id(user_id)
 
@@ -56,6 +57,7 @@ class User(Resource):
 class UserList(Resource):
     @classmethod
     @jwt_required
+    @UserModel.require_admin
     def get(cls):
         return {
             'users': list(map(lambda user: user.json(), UserModel.get_all()))
@@ -116,8 +118,9 @@ class UserLogin(Resource):
 
 
 class UserLogout(Resource):
+    @classmethod
     @jwt_required
-    def post(self):
+    def post(cls):
         user_id = get_jwt_identity()
         tokens = BlacklistToken.get_all_tokens_by_user_id(user_id)
 
