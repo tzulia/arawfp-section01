@@ -125,7 +125,4 @@ class UserLogout(Resource):
         for token in tokens:
             token.revoke()
 
-        return (
-            {"code": "logout_success", "message": USER_LOGOUT_SUCCESSFULLY},
-            200,
-        )
+        return ({"code": "logout_success", "message": USER_LOGOUT_SUCCESSFULLY}, 200)

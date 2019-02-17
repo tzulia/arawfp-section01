@@ -20,7 +20,10 @@ class Item(Resource):
         "price", type=float, required=True, help=PARSER_BLANK_ERROR.format("price")
     )
     parser.add_argument(
-        "store_name", type=str, required=True, help=PARSER_BLANK_ERROR.format("store_name")
+        "store_name",
+        type=str,
+        required=True,
+        help=PARSER_BLANK_ERROR.format("store_name"),
     )
 
     @jwt_required
@@ -42,9 +45,7 @@ class Item(Resource):
 
         if not store:
             return (
-                {
-                    "error": ITEM_STORE_NOT_FOUND_ERROR.format(data["store_name"])
-                },
+                {"error": ITEM_STORE_NOT_FOUND_ERROR.format(data["store_name"])},
                 404,
             )
 
@@ -81,11 +82,7 @@ class Item(Resource):
             store = StoreModel.find_by_name(data["store_name"])
             if not store:
                 return (
-                    {
-                        "error": ITEM_STORE_NOT_FOUND_ERROR.format(
-                            data["store_name"]
-                        )
-                    },
+                    {"error": ITEM_STORE_NOT_FOUND_ERROR.format(data["store_name"])},
                     404,
                 )
 

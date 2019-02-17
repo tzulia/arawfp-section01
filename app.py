@@ -11,6 +11,13 @@ from resources.user import User, UserList, UserLogin, UserLogout
 from resources.token import TokenRefresh, TokenList
 from models.token_blacklist import BlacklistToken
 
+# Message Strings Start
+TOKEN_AUTH_TOKEN_EXPIRED = "Token has expired"
+TOKEN_AUTH_TOKEN_INVALID = "Token is invalid."
+TOKEN_AUTH_TOKEN_NEED_FRESH = "Token needs to be fresh."
+TOKEN_AUTH_TOKEN_REVOKED = "Token has been revoked!"
+# Message Strings End
+
 app = Flask(__name__)
 app.secret_key = "28dd16028dd1602e2b7b92b2b7b92b79e7e40189df5f30e7e40189df5f30"
 
@@ -40,13 +47,13 @@ def token_in_blacklist_callback(decoded_token):
 
 @jwt.expired_token_loader
 def expired_token_callback():
-    return jsonify({"code": "token_expired", "message": "Token has expired."}), 401
+    return jsonify({"code": "token_expired", "message": TOKEN_AUTH_TOKEN_EXPIRED}), 401
 
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
     return (
-        jsonify({"code": "token_invalid", "message": "Signature verfication failed."}),
+        jsonify({"code": "token_invalid", "message": TOKEN_AUTH_TOKEN_INVALID}),
         401,
     )
 
@@ -55,7 +62,7 @@ def invalid_token_callback(error):
 def unauthorized_token_callback(error):
     return (
         jsonify(
-            {"code": "token_not_authorized", "message": "Token is not authorized."}
+            {"code": "token_invalid", "message": TOKEN_AUTH_TOKEN_INVALID}
         ),
         401,
     )
@@ -64,14 +71,14 @@ def unauthorized_token_callback(error):
 @jwt.needs_fresh_token_loader
 def needs_fresh_token_callback():
     return (
-        jsonify({"code": "token_need_fresh", "message": "Token needs to be fresh."}),
+        jsonify({"code": "token_need_fresh", "message": TOKEN_AUTH_TOKEN_NEED_FRESH}),
         401,
     )
 
 
 @jwt.revoked_token_loader
 def revoked_token_callback():
-    return jsonify({"code": "token_revoked", "message": "Token has been revoked."}), 401
+    return jsonify({"code": "token_revoked", "message": TOKEN_AUTH_TOKEN_REVOKED}), 401
 
 
 api.add_resource(Item, "/item/<string:name>")
