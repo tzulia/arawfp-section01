@@ -3,3 +3,4 @@ venv/
 __pycache__/
 .sock
 data.db
+.idea/

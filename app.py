@@ -41,40 +41,40 @@ def token_in_blacklist_callback(decoded_token):
 @jwt.expired_token_loader
 def expired_token_callback():
     return jsonify({
-        'error_code': 'token_expired',
-        'error': 'Token has expired.'
+        'code': 'token_expired',
+        'message': 'Token has expired.'
     }), 401
 
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
     return jsonify({
-        'error_code': 'token_invalid',
-        'error': 'Signature verfication failed.'
+        'code': 'token_invalid',
+        'message': 'Signature verfication failed.'
     }), 401
 
 
 @jwt.unauthorized_loader
 def unauthorized_token_callback(error):
     return jsonify({
-        'error_code': 'token_not_authorized',
-        'error': 'Token is not authorized.'
+        'code': 'token_not_authorized',
+        'message': 'Token is not authorized.'
     }), 401
 
 
 @jwt.needs_fresh_token_loader
 def needs_fresh_token_callback():
     return jsonify({
-        'error_code': 'token_need_fresh',
-        'error': 'Token needs to be fresh.'
+        'code': 'token_need_fresh',
+        'message': 'Token needs to be fresh.'
     }), 401
 
 
 @jwt.revoked_token_loader
 def revoked_token_callback():
     return jsonify({
-        'error_code': 'token_revoked',
-        'error': 'Token has been revoked.'
+        'code': 'token_revoked',
+        'message': 'Token has been revoked.'
     }), 401
 
 
@@ -92,7 +92,6 @@ api.add_resource(TokenList, '/auth/tokens')
 
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(UserList, '/users')
-
 
 
 # Create DB tables, if they do not exists.
