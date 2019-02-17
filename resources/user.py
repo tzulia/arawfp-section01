@@ -96,7 +96,15 @@ class UserLogin(Resource):
             new_access_token.save_to_db()
             new_refresh_token.save_to_db()
 
-            return {"access_token": access_token, "refresh_token": refresh_token}, 200
+            return (
+                {
+                    "code": "login_success",
+                    "message": "User Login Successfull.",
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                },
+                200,
+            )
 
         return {"error": "Invalid credentials"}, 401
 

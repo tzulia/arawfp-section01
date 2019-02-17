@@ -67,7 +67,9 @@ class BlacklistToken(db.Model):
     @classmethod
     def revoke_all_old_refresh_tokens(cls, user_id: int) -> None:
         # get the user.
-        tokens = cls.query.filter_by(token_type='refresh', user_identity=user_id, revoked=False).all()
+        tokens = cls.query.filter_by(
+            token_type="refresh", user_identity=user_id, revoked=False
+        ).all()
 
         for token in tokens:
             token.revoke()
