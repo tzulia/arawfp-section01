@@ -10,13 +10,23 @@ from werkzeug.security import safe_str_cmp
 from models.user import UserModel
 from models.token_blacklist import BlacklistToken
 
+# Message Strings Start #
+USER_NOT_FOUND_ERROR = "User not found"
+PARSER_BLANK_ERROR = "'{}' cannot be blank."
+USER_DELETED_SUCCESSFULLY = "User successfully deleted!"
+USER_ALREADY_EXISTS_ERROR = "User {} already exists!"
+USER_CREATED_SUCCESSFULLY = "User created successfully."
+USER_LOGIN_SUCCESSFULLY = "User logged in successfully."
+USER_LOGOUT_SUCCESSFULLY = "User logged out successfully."
+TOKEN_AUTH_INVALID_CREDENTIALS = "Invalid credentials"
+# Message Strings End #
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument(
-    "username", type=str, required=True, help="Please enter a username."
+    "username", type=str, required=True, help=PARSER_BLANK_ERROR.format("username")
 )
 _user_parser.add_argument(
-    "password", type=str, required=True, help="Please enter a password."
+    "password", type=str, required=True, help=PARSER_BLANK_ERROR.format("password")
 )
 
 
@@ -28,7 +38,7 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
 
         if not user:
-            return {"error": "User not found."}, 404
+            return {"error": USER_NOT_FOUND_ERROR}, 404
         return user.json()
 
     @classmethod
@@ -38,10 +48,10 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
 
         if not user:
-            return {"error": "User not found."}, 404
+            return {"error": USER_NOT_FOUND_ERROR}, 404
 
         user.delete_from_db()
-        return {"message": "User deleted."}
+        return {"message": USER_DELETED_SUCCESSFULLY}
 
 
 class UserList(Resource):
@@ -57,17 +67,12 @@ class UserRegister(Resource):
         data = _user_parser.parse_args()
 
         if UserModel.find_by_username(data["username"]):
-            return {"error": "User {} already exists!".format(data["username"])}, 400
-
-        if data["username"] == "tzulia":
-            data["is_admin"] = True
-        else:
-            data["is_admin"] = False
+            return {"error": USER_ALREADY_EXISTS_ERROR.format(data["username"])}, 400
 
         new_user = UserModel(**data)
         new_user.save_to_db()
 
-        return {"message": "User created successfully."}, 201
+        return {"message": USER_CREATED_SUCCESSFULLY}, 201
 
 
 class UserLogin(Resource):
@@ -99,14 +104,14 @@ class UserLogin(Resource):
             return (
                 {
                     "code": "login_success",
-                    "message": "User Login Successfull.",
+                    "message": USER_LOGIN_SUCCESSFULLY,
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 },
                 200,
             )
 
-        return {"error": "Invalid credentials"}, 401
+        return {"error": TOKEN_AUTH_INVALID_CREDENTIALS}, 401
 
 
 class UserLogout(Resource):
@@ -121,6 +126,6 @@ class UserLogout(Resource):
             token.revoke()
 
         return (
-            {"code": "logout_success", "message": "User logged out successfully"},
+            {"code": "logout_success", "message": USER_LOGOUT_SUCCESSFULLY},
             200,
         )

@@ -3,6 +3,13 @@ from flask_jwt_extended import jwt_required
 
 from models.store import StoreModel
 
+# Message String Start #
+STORE_NOT_FOUND_ERROR = "Store not found"
+STORE_ALREADY_EXISTS_ERROR = "Store already exists!"
+STORE_DELETED_SUCCESSFULLY = "Store deleted!"
+STORE_DB_ERROR = "The server did not answer in time, please try again later."
+# Message Strings End #
+
 
 class Store(Resource):
     @jwt_required
@@ -11,18 +18,18 @@ class Store(Resource):
         if store:
             return store.json(-1)
 
-        return {"message": "Store not found"}, 404
+        return {"message": STORE_NOT_FOUND_ERROR}, 404
 
     @jwt_required
     def post(self, name: str):
         if StoreModel.find_by_name(name):
-            return {"error": "Store already exists!"}, 400
+            return {"error": STORE_ALREADY_EXISTS_ERROR}, 400
 
         new_store = StoreModel(name)
         try:
             new_store.save_to_db()
         except Exception:
-            return {"message": "Failed to create new store."}, 500
+            return {"message": STORE_DB_ERROR}, 500
 
         return new_store.json(), 201
 

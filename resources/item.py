@@ -4,14 +4,23 @@ from flask_jwt_extended import jwt_required
 from models.item import ItemModel
 from models.store import StoreModel
 
+# Message Strings Start #
+PARSER_BLANK_ERROR = "'{}' cannot be blank."
+ITEM_NOT_FOUND_ERROR = "Item not found"
+ITEM_ALREADY_EXISTS_ERROR = "Item already exists!"
+ITEM_STORE_NOT_FOUND_ERROR = "A Store with the name '{}' was not found."
+ITEM_DB_ERROR = "The server did not answer in time, please try again later."
+ITEM_DELETED_SUCCESSFULLY = "Item {} deleted!"
+# Message String End #
+
 
 class Item(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "price", type=float, required=True, help="This field cannot be left blank!"
+        "price", type=float, required=True, help=PARSER_BLANK_ERROR.format("price")
     )
     parser.add_argument(
-        "store_name", type=str, required=True, help="Every item needs a store_name"
+        "store_name", type=str, required=True, help=PARSER_BLANK_ERROR.format("store_name")
     )
 
     @jwt_required
@@ -21,12 +30,12 @@ class Item(Resource):
         if item:
             return item.json()
 
-        return {"error": "Item not found"}, 404
+        return {"error": ITEM_NOT_FOUND_ERROR}, 404
 
     @jwt_required
     def post(self, name: str):
         if ItemModel.find_by_name(name):
-            return {"error": "Item already exists!"}, 400
+            return {"error": ITEM_ALREADY_EXISTS_ERROR}, 400
 
         data = Item.parser.parse_args()
         store = StoreModel.find_by_name(data["store_name"])
@@ -34,9 +43,7 @@ class Item(Resource):
         if not store:
             return (
                 {
-                    "error": "A Store with the name '{}' was not found.".format(
-                        data["store_name"]
-                    )
+                    "error": ITEM_STORE_NOT_FOUND_ERROR.format(data["store_name"])
                 },
                 404,
             )
@@ -46,7 +53,7 @@ class Item(Resource):
         try:
             new_item.save_to_db()
         except Exception:
-            return {"error": "Cannot create new item."}, 500
+            return {"error": ITEM_DB_ERROR}, 500
 
         return new_item.json(), 201
 
@@ -66,7 +73,7 @@ class Item(Resource):
             try:
                 item.save_to_db()
             except Exception:
-                return {"error": "Cannot save item to DB, please try again later."}, 500
+                return {"error": ITEM_DB_ERROR}, 500
 
             return item.json()
         else:
@@ -75,7 +82,7 @@ class Item(Resource):
             if not store:
                 return (
                     {
-                        "error": "A store with the name '{}' was not found".format(
+                        "error": ITEM_STORE_NOT_FOUND_ERROR.format(
                             data["store_name"]
                         )
                     },
@@ -87,7 +94,7 @@ class Item(Resource):
             try:
                 new_item.save_to_db()
             except Exception:
-                return {"error": "Cannot save item to DB, please try again later."}, 500
+                return {"error": ITEM_DB_ERROR}, 500
 
             return new_item.json(), 201
 
@@ -95,11 +102,11 @@ class Item(Resource):
     def delete(self, name: str):
         item = ItemModel.find_by_name(name)
         if not item:
-            return {"error": "Item does not exist"}, 400
+            return {"error": ITEM_NOT_FOUND_ERROR}, 400
 
         item.delete_from_db()
 
-        return {"message": "Item {} deleted!".format(name)}
+        return {"message": ITEM_DELETED_SUCCESSFULLY.format(name)}
 
 
 class ItemList(Resource):
