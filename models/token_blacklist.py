@@ -1,10 +1,12 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from datetime import datetime
 
 from flask_jwt_extended import decode_token
 
 from db import db
+
+TokenJSON = Dict[str, Union[int, str, bool, datetime]]
 
 
 def _epoch_utc_to_datetime(epoch_utc: str):
@@ -37,7 +39,7 @@ class BlacklistToken(db.Model):
         self.revoked = False
         self.expires = _epoch_utc_to_datetime(decoded_token['exp'])
 
-    def json(self) -> Dict:
+    def json(self) -> TokenJSON:
         return {
             'id': self.id,
             'jti': self.jti,

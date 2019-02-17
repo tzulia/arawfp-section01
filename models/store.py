@@ -1,6 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from db import db
+
+from models.item import ItemJSON
+
+StoreJSON = Dict[str, Union[int, str, List[ItemJSON]]]
 
 
 class StoreModel(db.Model):
@@ -14,7 +18,7 @@ class StoreModel(db.Model):
     def __init__(self, name: str):
         self.name = name
 
-    def json(self, limit: int = 10) -> Dict:
+    def json(self, limit: int = 10) -> StoreJSON:
         """
             This function returns the StoreModel object in json format.
             Normally it only fetches the first 10 items in the store, though

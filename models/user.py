@@ -1,8 +1,12 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 from functools import wraps
 
 from db import db
 from flask_jwt_extended import get_jwt_identity
+
+from models.token_blacklist import TokenJSON
+
+UserJSON = Dict[str, Union[int, str, bool, List[TokenJSON]]]
 
 
 class UserModel(db.Model):
@@ -20,7 +24,7 @@ class UserModel(db.Model):
         self.password = password
         self.is_admin = is_admin
 
-    def json(self) -> Dict:
+    def json(self) -> UserJSON:
         return {
             'id': self.id,
             'username': self.username,
