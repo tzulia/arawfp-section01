@@ -10,14 +10,14 @@ UserJSON = Dict[str, Union[int, str, bool, List[TokenJSON]]]
 
 
 class UserModel(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False)
     password = db.Column(db.String(80), nullable=False)
     is_admin = db.Column(db.Boolean)
 
-    tokens = db.relationship('BlacklistToken', lazy='dynamic')
+    tokens = db.relationship("BlacklistToken", lazy="dynamic")
 
     def __init__(self, username: str, password: str, is_admin: bool):
         self.username = username
@@ -26,10 +26,10 @@ class UserModel(db.Model):
 
     def json(self) -> UserJSON:
         return {
-            'id': self.id,
-            'username': self.username,
-            'is_admin': self.is_admin,
-            'tokens': [t.json() for t in self.tokens.limit(10).all()]
+            "id": self.id,
+            "username": self.username,
+            "is_admin": self.is_admin,
+            "tokens": [t.json() for t in self.tokens.limit(10).all()],
         }
 
     @classmethod
@@ -48,9 +48,9 @@ class UserModel(db.Model):
         if self.username and self.password:
             db.session.add(self)
             db.session.commit()
-            return {'message': 'Saved'}, 200
+            return {"message": "Saved"}, 200
         else:
-            return {'error': 'Please input username/password'}, 400
+            return {"error": "Please input username/password"}, 400
 
     def delete_from_db(self) -> None:
         db.session.delete(self)
@@ -65,7 +65,6 @@ class UserModel(db.Model):
                 user = UserModel.find_by_id(user_id)
                 if user and user.is_admin:
                     return func(*args, **kwargs)
-            return {
-                'error': 'Invalid Credentials'
-            }, 401
+            return {"error": "Invalid Credentials"}, 401
+
         return function_that_runs_func

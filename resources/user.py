@@ -1,6 +1,8 @@
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
-    create_access_token, create_refresh_token, get_jwt_identity
+    create_access_token,
+    create_refresh_token,
+    get_jwt_identity,
 )
 from flask_jwt_extended import jwt_required
 from werkzeug.security import safe_str_cmp
@@ -11,16 +13,10 @@ from models.token_blacklist import BlacklistToken
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument(
-    'username',
-    type=str,
-    required=True,
-    help="Please enter a username."
+    "username", type=str, required=True, help="Please enter a username."
 )
 _user_parser.add_argument(
-    'password',
-    type=str,
-    required=True,
-    help="Please enter a password."
+    "password", type=str, required=True, help="Please enter a password."
 )
 
 
@@ -32,9 +28,7 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
 
         if not user:
-            return {
-                'error': 'User not found.'
-            }, 404
+            return {"error": "User not found."}, 404
         return user.json()
 
     @classmethod
@@ -44,14 +38,10 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
 
         if not user:
-            return {
-                'error': 'User not found.'
-            }, 404
+            return {"error": "User not found."}, 404
 
         user.delete_from_db()
-        return {
-            'message': 'User deleted.'
-        }
+        return {"message": "User deleted."}
 
 
 class UserList(Resource):
@@ -59,29 +49,25 @@ class UserList(Resource):
     @jwt_required
     @UserModel.require_admin
     def get(cls):
-        return {
-            'users': [user.json() for user in UserModel.get_all()]
-        }
+        return {"users": [user.json() for user in UserModel.get_all()]}
 
 
 class UserRegister(Resource):
     def post(self):
         data = _user_parser.parse_args()
 
-        if UserModel.find_by_username(data['username']):
-            return {
-                'error': 'User {} already exists!'.format(data['username'])
-            }, 400
+        if UserModel.find_by_username(data["username"]):
+            return {"error": "User {} already exists!".format(data["username"])}, 400
 
-        if data['username'] == 'tzulia':
-            data['is_admin'] = True
+        if data["username"] == "tzulia":
+            data["is_admin"] = True
         else:
-            data['is_admin'] = False
+            data["is_admin"] = False
 
         new_user = UserModel(**data)
         new_user.save_to_db()
 
-        return {'message': 'User created successfully.'}, 201
+        return {"message": "User created successfully."}, 201
 
 
 class UserLogin(Resource):
@@ -91,10 +77,10 @@ class UserLogin(Resource):
         data = _user_parser.parse_args()
 
         # find user in database
-        user = UserModel.find_by_username(data['username'])
+        user = UserModel.find_by_username(data["username"])
 
         # check password
-        if user and safe_str_cmp(user.password, data['password']):
+        if user and safe_str_cmp(user.password, data["password"]):
             # create access token
             access_token = create_access_token(identity=user.id, fresh=True)
             # create refresh token
@@ -107,14 +93,9 @@ class UserLogin(Resource):
             new_access_token.save_to_db()
             new_refresh_token.save_to_db()
 
-            return {
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }, 200
+            return {"access_token": access_token, "refresh_token": refresh_token}, 200
 
-        return {
-            'error': 'Invalid credentials'
-        }, 401
+        return {"error": "Invalid credentials"}, 401
 
 
 class UserLogout(Resource):
@@ -128,7 +109,7 @@ class UserLogout(Resource):
         for token in tokens:
             token.revoke()
 
-        return {
-            'code': 'logout_success',
-            'message': 'User logged out successfully'
-        }, 200
+        return (
+            {"code": "logout_success", "message": "User logged out successfully"},
+            200,
+        )

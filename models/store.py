@@ -8,12 +8,12 @@ StoreJSON = Dict[str, Union[int, str, List[ItemJSON]]]
 
 
 class StoreModel(db.Model):
-    __tablename__ = 'stores'
+    __tablename__ = "stores"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
 
-    items = db.relationship('ItemModel', lazy='dynamic')
+    items = db.relationship("ItemModel", lazy="dynamic")
 
     def __init__(self, name: str):
         self.name = name
@@ -27,9 +27,9 @@ class StoreModel(db.Model):
             ::params limit:: The amount of items to fetch from the DB.
         """
         return {
-            'id': self.id,
-            'name': self.name,
-            'items': [item.json() for item in self.items.limit(limit).all()]
+            "id": self.id,
+            "name": self.name,
+            "items": [item.json() for item in self.items.limit(limit).all()],
         }
 
     @classmethod

@@ -6,14 +6,14 @@ ItemJSON = Dict[str, Union[int, str, float]]
 
 
 class ItemModel(db.Model):
-    __tablename__ = 'items'
+    __tablename__ = "items"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
     price = db.Column(db.Float(precision=2), nullable=False)
 
-    store_id = db.Column(db.Integer, db.ForeignKey('stores.id'))
-    store = db.relationship('StoreModel')
+    store_id = db.Column(db.Integer, db.ForeignKey("stores.id"))
+    store = db.relationship("StoreModel")
 
     def __init__(self, name: str, price: float, store_id: int):
         self.name = name
@@ -26,7 +26,7 @@ class ItemModel(db.Model):
             "name": self.name,
             "price": self.price,
             "store": self.store.name,
-            "store_id": self.store_id
+            "store_id": self.store_id,
         }
 
     @classmethod
