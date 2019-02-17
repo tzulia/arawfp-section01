@@ -81,6 +81,9 @@ class UserLogin(Resource):
 
         # check password
         if user and safe_str_cmp(user.password, data["password"]):
+            # Black list all old refresh tokens before making new ones.
+            BlacklistToken.revoke_all_old_refresh_tokens(user.id)
+
             # create access token
             access_token = create_access_token(identity=user.id, fresh=True)
             # create refresh token

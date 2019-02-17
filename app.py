@@ -88,16 +88,3 @@ api.add_resource(TokenList, "/auth/tokens")
 
 api.add_resource(User, "/user/<int:user_id>")
 api.add_resource(UserList, "/users")
-
-
-# Create DB tables, if they do not exists.
-@app.before_first_request
-def create_db_tables():
-    db.create_all()
-
-
-if __name__ == "__main__":  # make sure, not to run this code again on import.
-    from db import db
-
-    db.init_app(app)
-    app.run(port=5000)

@@ -6,6 +6,7 @@ from flask_jwt_extended import decode_token
 
 from db import db
 
+
 TokenJSON = Dict[str, Union[int, str, bool, datetime]]
 
 
@@ -64,8 +65,16 @@ class BlacklistToken(db.Model):
         return db_token.revoked
 
     @classmethod
-    def get_all(cls, filter: int = 10) -> List[TokenJSON]:
-        return [t.json() for t in cls.query.limit(filter).all()]
+    def revoke_all_old_refresh_tokens(cls, user_id: int) -> None:
+        # get the user.
+        tokens = cls.query.filter_by(token_type='refresh', user_identity=user_id, revoked=False).all()
+
+        for token in tokens:
+            token.revoke()
+
+    @classmethod
+    def get_all(cls, filter_result: int = 10) -> List[TokenJSON]:
+        return [t.json() for t in cls.query.limit(filter_result).all()]
 
     def revoke(self) -> bool:
         self.revoked = True
